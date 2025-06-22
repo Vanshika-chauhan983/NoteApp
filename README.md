@@ -27,3 +27,12 @@ The application is based on Clean Architecture principles with a clear separatio
 - Room Database
 - Hilt for Dependency Injection
 - Kotlin Coroutines and Flow for asynchronous and reactive programming
+
+## Screenshots
+
+### Notes Screen
+<img src="screenshots/notes_screen.png" width="300">
+
+### Note Add Edit Screen
+<img src="screenshots/note_add_edit_screen.png" width="300">
+
