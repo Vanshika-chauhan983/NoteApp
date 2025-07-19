@@ -1,6 +1,8 @@
 package com.vanshika.notesapp.feature_note.presentation.add_edit_note
 
 import android.annotation.SuppressLint
+import android.graphics.drawable.Icon
+import android.speech.SpeechRecognizer
 import androidx.compose.animation.Animatable
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
@@ -20,13 +22,17 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Done
+import androidx.compose.material.icons.outlined.Face
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -35,6 +41,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
@@ -42,6 +49,7 @@ import com.vanshika.notesapp.feature_note.domain.model.Note
 import com.vanshika.notesapp.feature_note.presentation.add_edit_note.components.HintTextField
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import okhttp3.Dispatcher
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
@@ -55,6 +63,23 @@ fun AddEditNoteScreen(
 
     val snackbarHostState = remember{SnackbarHostState()}
     val scope = rememberCoroutineScope()
+    val context = LocalContext.current
+
+    val speechRecognizerManager = remember {
+        SpeechRecognizerManager(
+            context,
+            onResult = {spokenContent ->
+                viewModel.onEvent(AddEditNoteEvent.SpokenContent(spokenContent))
+            },
+            onError = { error->
+                scope.launch { snackbarHostState.showSnackbar(
+                    message = error,
+                    actionLabel = "Error",
+                    duration = SnackbarDuration.Short
+                ) }
+            }
+        )
+    }
 
     val noteBackgroundAnimatable = remember {
         Animatable(
@@ -146,19 +171,38 @@ fun AddEditNoteScreen(
                 textStyle = MaterialTheme.typography.headlineLarge
             )
             Spacer(modifier = Modifier.height(16.dp))
-            HintTextField(
-                text = contentState.text,
-                hint = contentState.hint,
-                onValueChange = {
-                    viewModel.onEvent(AddEditNoteEvent.EnteredContent(it))
-                },
-                onFocusChange = {
-                    viewModel.onEvent(AddEditNoteEvent.ChangeContentFocus(it))
-                },
-                isHintVisible = contentState.isHintVisible,
-                textStyle = MaterialTheme.typography.headlineSmall,
-                modifier = Modifier.fillMaxHeight()
-            )
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(8.dp),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ){
+                HintTextField(
+                    text = contentState.text,
+                    hint = contentState.hint,
+                    onValueChange = {
+                        viewModel.onEvent(AddEditNoteEvent.EnteredContent(it))
+                    },
+                    onFocusChange = {
+                        viewModel.onEvent(AddEditNoteEvent.ChangeContentFocus(it))
+                    },
+                    isHintVisible = contentState.isHintVisible,
+                    textStyle = MaterialTheme.typography.headlineSmall,
+                    modifier = Modifier.fillMaxHeight(),
+                    trailingIcon = {
+                        IconButton(onClick = {
+                            speechRecognizerManager.startListening()
+                        }) {
+                            Icon(Icons.Outlined.Face, contentDescription = "Speak")
+                        }
+                    }
+                )
+            }
+        }
+    }
+    DisposableEffect(Unit) {
+        onDispose {
+            speechRecognizerManager.destroy()
         }
     }
 }

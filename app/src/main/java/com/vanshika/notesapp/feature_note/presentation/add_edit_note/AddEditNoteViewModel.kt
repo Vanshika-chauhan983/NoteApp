@@ -69,7 +69,14 @@ class AddEditNoteViewModel @Inject constructor(
             }
             is AddEditNoteEvent.EnteredContent -> {
                 _noteContent.value = noteContent.value.copy(
-                    text = event.value
+                    text = event.value,
+                    isSpoken = false
+                )
+            }
+            is AddEditNoteEvent.SpokenContent -> {
+                _noteContent.value = noteContent.value.copy(
+                    text = event.value,
+                    isSpoken = true
                 )
             }
             is AddEditNoteEvent.ChangeTitleFocus -> {

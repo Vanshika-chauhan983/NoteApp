@@ -8,7 +8,6 @@ sealed class AddEditNoteEvent{
     data class ChangeTitleFocus(val focusState: FocusState):AddEditNoteEvent()
     data class ChangeContentFocus(val focusState: FocusState):AddEditNoteEvent()
     data class ChangeColor(val color:Int):AddEditNoteEvent()
+    data class SpokenContent(val value: String):AddEditNoteEvent()
     object SaveNote:AddEditNoteEvent()
 }
-
-
