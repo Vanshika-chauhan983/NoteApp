@@ -2,8 +2,11 @@ package com.vanshika.notesapp.di
 
 import android.app.Application
 import androidx.room.Room
+import com.google.firebase.auth.FirebaseAuth
 import com.vanshika.notesapp.feature_note.data.data_source.NoteDatabase
+import com.vanshika.notesapp.feature_note.data.repository.AuthRepositoryImpl
 import com.vanshika.notesapp.feature_note.data.repository.NoteRepositoryImplementation
+import com.vanshika.notesapp.feature_note.domain.repository.AuthRepository
 import com.vanshika.notesapp.feature_note.domain.repository.noteRepository
 import com.vanshika.notesapp.feature_note.domain.use_case.DeleteNote
 import com.vanshika.notesapp.feature_note.domain.use_case.GetNote
@@ -21,7 +24,7 @@ import javax.inject.Singleton
 object AppModule {
     @Provides
     @Singleton
-    fun provideNoteDatabase(app : Application): NoteDatabase {
+    fun provideNoteDatabase(app: Application): NoteDatabase {
         return Room.databaseBuilder(
             app,
             NoteDatabase::class.java,
@@ -31,7 +34,7 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideNoteRepository(db : NoteDatabase): noteRepository {
+    fun provideNoteRepository(db: NoteDatabase): noteRepository {
         return NoteRepositoryImplementation(db.NoteDao)
     }
 
@@ -44,5 +47,15 @@ object AppModule {
             addNote = addNote(noteRepository),
             getNote = GetNote(noteRepository)
         )
+    }
+
+    @Provides
+    @Singleton
+    fun provideFirebaseAuth(): FirebaseAuth = FirebaseAuth.getInstance()
+
+    @Provides
+    @Singleton
+    fun provideAuthRepository(auth: FirebaseAuth): AuthRepository {
+        return AuthRepositoryImpl(auth)
     }
 }

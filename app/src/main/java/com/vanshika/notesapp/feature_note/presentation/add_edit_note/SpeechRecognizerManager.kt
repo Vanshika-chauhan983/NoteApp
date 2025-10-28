@@ -8,9 +8,10 @@ import android.speech.RecognizerIntent
 import android.speech.SpeechRecognizer
 
 class SpeechRecognizerManager(
-    private val context: Context,
+    context: Context,
     private val onResult: (String) -> Unit,
-    private val onError: (String) -> Unit
+    private val onError: (String) -> Unit,
+    private val onListeningStateChanged: (Boolean) -> Unit
 ) {
     private var speechRecognizer: SpeechRecognizer? = null
     private var recognizerIntent: Intent? = null
@@ -18,17 +19,25 @@ class SpeechRecognizerManager(
     init {
         speechRecognizer = SpeechRecognizer.createSpeechRecognizer(context)
         speechRecognizer?.setRecognitionListener(object : RecognitionListener {
-            override fun onReadyForSpeech(p0: Bundle?) {}
-            override fun onBeginningOfSpeech() {}
+            override fun onReadyForSpeech(p0: Bundle?) {
+                onListeningStateChanged(true)
+            }
+            override fun onBeginningOfSpeech() {
+                onListeningStateChanged(true)
+            }
             override fun onRmsChanged(p0: Float) {}
             override fun onBufferReceived(p0: ByteArray?) {}
-            override fun onEndOfSpeech() {}
+            override fun onEndOfSpeech() {
+                onListeningStateChanged(false)
+            }
 
             override fun onError(p0: Int) {
+                onListeningStateChanged(false)
                 onError("Speech recognition error: $p0")
             }
 
             override fun onResults(p0: Bundle?) {
+                onListeningStateChanged(false)
                 val results = p0?.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION)
                 results?.firstOrNull()?.let {
                     onResult(it)

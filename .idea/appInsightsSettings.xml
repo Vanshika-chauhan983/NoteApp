@@ -8,10 +8,10 @@
             <InsightsFilterSettings>
               <option name="connection">
                 <ConnectionSetting>
-                  <option name="appId" value="PLACEHOLDER" />
-                  <option name="mobileSdkAppId" value="" />
-                  <option name="projectId" value="" />
-                  <option name="projectNumber" value="" />
+                  <option name="appId" value="com.vanshika.notesapp" />
+                  <option name="mobileSdkAppId" value="1:48568282957:android:5e8f932059160aa3d69104" />
+                  <option name="projectId" value="notes-app-2436e" />
+                  <option name="projectNumber" value="48568282957" />
                 </ConnectionSetting>
               </option>
               <option name="signal" value="SIGNAL_UNSPECIFIED" />
